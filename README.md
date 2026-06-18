@@ -1,7 +1,9 @@
 # Magento 2.4.x MageStack Integration
 
 ## Main Functionalities
-The main aim is to make API integration easy, fast and secure. This module provides plugable authentication mechanisms, opens doors for n number of authentications as per your needs. Reduce your boiler plate code and keep you focus on faster integration. 
+Magento 2 Integration Framework is a flexible and extensible framework that simplifies external API integrations. It provides reusable integration components and a pluggable authentication architecture supporting API Key, Basic Authentication, Bearer Token, OAuth 2.0, JWT, and custom authentication methods.
+
+By standardizing common integration patterns and abstracting authentication and communication concerns, the framework reduces boilerplate code, improves consistency, and enables developers to build secure, scalable integrations faster while focusing on business requirements instead of infrastructure.
 
 ## Stability
-Currently module in progress and not stable
+Currently module in progress and is unstable
