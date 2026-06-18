@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:element name="apis">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="api" type="apiType" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:complexType name="apiType">
+        <xs:sequence>
+            <xs:element name="base_url" type="xs:string"/>
+            <xs:element name="authentication" type="authenticationType" minOccurs="0"/>
+            <xs:element name="timeout" type="xs:int" minOccurs="0"/>
+            <xs:element name="retry" type="retryType" minOccurs="0"/>
+            <xs:element name="cache" type="cacheType" minOccurs="0"/>
+            <xs:element name="endpoints" type="endpointsType" minOccurs="0"/>
+            <xs:element name="websites" type="websitesType" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required"/>
+        <xs:attribute name="enabled" type="xs:boolean" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="authenticationType">
+        <xs:attribute name="type" type="xs:string" use="optional"/>
+        <xs:attribute name="token_endpoint" type="xs:string" use="optional"/>
+        <xs:attribute name="token_ttl" type="xs:int" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="retryType">
+        <xs:sequence>
+            <xs:element name="http_code" type="xs:int" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="enabled" type="xs:boolean" use="optional"/>
+        <xs:attribute name="max_attempts" type="xs:int" use="optional"/>
+        <xs:attribute name="initial_delay" type="xs:int" use="optional"/>
+        <xs:attribute name="backoff_multiplier" type="xs:int" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="cacheType">
+        <xs:attribute name="enabled" type="xs:boolean" use="optional"/>
+        <xs:attribute name="ttl" type="xs:int" use="optional"/>
+        <xs:attribute name="key_prefix" type="xs:string" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="endpointsType">
+        <xs:sequence>
+            <xs:element name="endpoint" type="endpointType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="endpointType">
+        <xs:sequence>
+            <xs:element name="cache" type="cacheType" minOccurs="0"/>
+            <xs:element name="retry" type="retryType" minOccurs="0"/>
+            <xs:element name="request_builder" type="xs:string" minOccurs="0"/>
+            <xs:element name="response_handler" type="xs:string" minOccurs="0"/>
+            <xs:element name="response_validator" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:string" use="required"/>
+        <xs:attribute name="method" type="xs:string" use="optional"/>
+        <xs:attribute name="path" type="xs:string" use="optional"/>
+        <xs:attribute name="enabled" type="xs:boolean" use="optional"/>
+        <xs:attribute name="timeout" type="xs:int" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="websitesType">
+        <xs:sequence>
+            <xs:element name="website" type="websiteType" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="websiteType">
+        <xs:sequence>
+            <xs:element name="base_url" type="xs:string" minOccurs="0"/>
+            <xs:element name="authentication" type="authenticationType" minOccurs="0"/>
+            <xs:element name="timeout" type="xs:int" minOccurs="0"/>
+            <xs:element name="retry" type="retryType" minOccurs="0"/>
+            <xs:element name="cache" type="cacheType" minOccurs="0"/>
+            <xs:element name="endpoints" type="endpointsType" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="code" type="xs:string" use="required"/>
+    </xs:complexType>
+</xs:schema>

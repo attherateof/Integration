@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <virtualType name="MageStack\Integration\Model\Config\Reader" type="Magento\Framework\Config\Reader\Filesystem">
+        <arguments>
+            <argument name="converter" xsi:type="object">MageStack\Integration\Model\Config\Converter</argument>
+            <argument name="schemaLocator" xsi:type="object">MageStack\Integration\Model\Config\SchemaLocator</argument>
+            <argument name="fileName" xsi:type="string">int_api.xml</argument>
+            <argument name="idAttributes" xsi:type="array">
+                <item name="/apis/api" xsi:type="string">id</item>
+                <item name="/apis/api/endpoints/endpoint" xsi:type="string">id</item>
+                <item name="/apis/api/websites/website" xsi:type="string">code</item>
+                <item name="/apis/api/websites/website/endpoints/endpoint" xsi:type="string">id</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="MageStack\Integration\Model\IntegrationConfig">
+        <arguments>
+            <argument name="reader" xsi:type="object">MageStack\Integration\Model\Config\Reader</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="int_config" xsi:type="object">MageStack\Integration\Console\Command\ShowConfigs</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="MageStack\Integration\Model\Auth\AuthenticationPool">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="no_auth" xsi:type="object">MageStack\Integration\Model\Auth\Pool\NoAuthProvider</item>
+                <item name="bearer" xsi:type="object">MageStack\Integration\Model\Auth\Pool\BearerProvider</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <preference
+        for="MageStack\Integration\Api\Data\CredentialInterface"
+        type="MageStack\Integration\Model\Credential"/>
+
+    <preference
+        for="MageStack\Integration\Api\CredentialRepositoryInterface"
+        type="MageStack\Integration\Model\CredentialRepository"/>
+
+    <preference
+        for="MageStack\Integration\Api\Data\CredentialSearchResultsInterface"
+        type="MageStack\Integration\Model\CredentialSearchResults"/>
+</config>
