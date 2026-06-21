@@ -20,6 +20,7 @@ class Converter implements ConverterInterface
      * Tag names
      */
     private const TAG_API = 'api';
+    private const TITLE = 'title';
     private const TAG_BASE_URL = 'base_url';
     private const TAG_TIMEOUT = 'timeout';
     private const TAG_AUTHENTICATION = 'authentication';
@@ -109,6 +110,7 @@ class Converter implements ConverterInterface
     {
         return [
             self::ATTR_ENABLED => $this->getOptionalBoolAttribute($node, self::ATTR_ENABLED),
+            self::TITLE => $this->getDirectChildText($node, self::TITLE),
             self::TAG_BASE_URL => $this->getDirectChildText($node, self::TAG_BASE_URL),
             self::TAG_TIMEOUT => $this->getDirectChildText($node, self::TAG_TIMEOUT) !== ''
                 ? (int) $this->getDirectChildText($node, self::TAG_TIMEOUT)

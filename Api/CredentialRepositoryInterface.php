@@ -18,9 +18,16 @@ interface CredentialRepositoryInterface
     ): CredentialInterface;
 
     /**
+     * @param CredentialInterface[] $credentials
+     */
+    public function saveMultiple(
+        array $credentials
+    ): void;
+
+    /**
      * Get credential by ID.
      */
-    public function getById(
+    public function get(
         int $credentialId
     ): CredentialInterface;
 
@@ -44,6 +51,10 @@ interface CredentialRepositoryInterface
     public function deleteById(
         int $credentialId
     ): bool;
+
+    public function getByWebsiteId(
+        int $websiteId
+    ): array;
 
     /**
      * Returns all credential values for API/Website.

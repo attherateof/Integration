@@ -50,4 +50,19 @@
     <preference
         for="MageStack\Integration\Api\Data\CredentialSearchResultsInterface"
         type="MageStack\Integration\Model\CredentialSearchResults"/>
+
+    <!-- <type name="MageStack\Integration\Model\Config\RequestBuilderPool">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="erp_default_get_user_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\InventoryRequestBuilderFactory</item>
+                <item name="erp_default_get_products_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\UserRequestBuilderFactory</item>
+                <item name="erp_default_sync_inventory_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\InventoryRequestBuilderFactory</item>
+                <item name="erp_default_export_order_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\UserRequestBuilderFactory</item>
+                <item name="erp_in_get_products_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\InventoryRequestBuilderFactory</item>
+                <item name="crm_default_get_customer_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\UserRequestBuilderFactory</item>
+                <item name="crm_default_search_customers_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\InventoryRequestBuilderFactory</item>
+                <item name="crm_default_create_lead_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\UserRequestBuilderFactory</item>
+            </argument>
+        </arguments>
+    </type> -->
 </config>

@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd"
+         name="magestack_integration_listing">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">magestack_integration_listing.magestack_integration_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>integration_columns</spinner>
+        <deps>
+            <dep>magestack_integration_listing.magestack_integration_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="magestack_integration_listing_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>MageStack_Integration::integration</aclResource>
+        <dataProvider name="magestack_integration_listing_data_source" class="MageStack\Integration\Ui\DataProvider\IntegrationDataProvider">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>true</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <filterSearch name="fulltext"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="integration_columns">
+        <settings>
+            <childDefaults>
+                <param name="storageConfig" xsi:type="array">
+                    <item name="provider" xsi:type="string">
+                        magestack_integration_listing.listing_top.bookmarks
+                    </item>
+                    <item name="root" xsi:type="string">
+                        columns.${ $.index }
+                    </item>
+                    <item name="namespace" xsi:type="string">
+                        current.${ $.storageConfig.root }
+                    </item>
+                </param>
+            </childDefaults>
+            <storageConfig>
+                <namespace>current</namespace>
+                <provider>
+                    magestack_integration_listing.listing_top.bookmarks
+                </provider>
+            </storageConfig>
+        </settings>
+        <selectionsColumn name="ids" sortOrder="10">
+            <settings>
+                <indexField>id</indexField>
+                <visible>false</visible>
+            </settings>
+        </selectionsColumn>
+        <column name="api_code" sortOrder="20">
+            <settings>
+                <label translate="true">API Code</label>
+                <filter>text</filter>
+                <sorting>asc</sorting>
+            </settings>
+        </column>
+        <column name="title" sortOrder="30">
+            <settings>
+                <label translate="true">Title</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="base_url" sortOrder="40">
+            <settings>
+                <label translate="true">Base URL</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="auth_type" sortOrder="50">
+            <settings>
+                <label translate="true">Authentication</label>
+                <filter>text</filter>
+            </settings>
+        </column>
+        <column name="endpoint_count" sortOrder="60">
+            <settings>
+                <label translate="true">Endpoints</label>
+                <filter>textRange</filter>
+            </settings>
+        </column>
+        <column name="website_count" sortOrder="70">
+            <settings>
+                <label translate="true">Website Overrides</label>
+                <filter>textRange</filter>
+            </settings>
+        </column>
+        <column name="enabled" sortOrder="80">
+            <settings>
+                <label translate="true">Enabled</label>
+                <dataType>boolean</dataType>
+                <filter>select</filter>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="MageStack\Integration\Ui\Component\Listing\Column\Actions" sortOrder="100">
+            <settings>
+                <indexField>id</indexField>
+                <label translate="true">Actions</label>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

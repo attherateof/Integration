@@ -46,12 +46,11 @@ class BearerProvider extends AbstractProvider
     public function getConfigurationFields(): array
     {
         return [
-            [
-                'code' => 'token',
+            'bearer_token' => [
                 'label' => 'Bearer Token',
                 'type' => 'password',
                 'encrypted' => true,
-                'required' => true
+                'class' => 'required-entry'
             ]
         ];
     }

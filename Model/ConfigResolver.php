@@ -28,15 +28,16 @@ class ConfigResolver
         $website = $api['websites'][$websiteCode] ?? [];
 
         return [
-            'enabled' => $api['enabled'] ?? true,
-            'authentication' => $this->resolveAuthentication(
-                $api,
-                $website
-            ),
-            'endpoints' => $this->resolveEndpoints(
-                $api,
-                $website
-            )
+            'raw' => $this->config->resolve()['apis']
+            // 'enabled' => $api['enabled'] ?? true,
+            // 'authentication' => $this->resolveAuthentication(
+            //     $api,
+            //     $website
+            // ),
+            // 'endpoints' => $this->resolveEndpoints(
+            //     $api,
+            //     $website
+            // )
         ];
     }
 

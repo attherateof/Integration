@@ -9,6 +9,7 @@
     </xs:element>
     <xs:complexType name="apiType">
         <xs:sequence>
+            <xs:element name="title" type="xs:string"/>
             <xs:element name="base_url" type="xs:string"/>
             <xs:element name="authentication" type="authenticationType" minOccurs="0"/>
             <xs:element name="timeout" type="xs:int" minOccurs="0"/>

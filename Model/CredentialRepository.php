@@ -41,7 +41,25 @@ class CredentialRepository implements CredentialRepositoryInterface
         return $credential;
     }
 
-    public function getById(
+    /**
+     * @param CredentialInterface[] $credentials
+     */
+    public function saveMultiple(
+        array $credentials
+    ): void {
+        try {
+            $this->resource->saveMultiple(
+                $credentials
+            );
+        } catch (\Throwable $exception) {
+            throw new CouldNotSaveException(
+                __('Unable to save credentials.'),
+                $exception
+            );
+        }
+    }
+
+    public function get(
         int $credentialId
     ): CredentialInterface {
         $credential = $this->credentialFactory->create();
@@ -134,6 +152,19 @@ class CredentialRepository implements CredentialRepositoryInterface
         }
 
         return $credentials;
+    }
+
+    public function getByWebsiteId(
+        int $websiteId
+    ): array {
+        $collection = $this->collectionFactory->create();
+
+        $collection->addFieldToFilter(
+            CredentialInterface::WEBSITE_ID,
+            $websiteId
+        );
+
+        return $collection->getItems();
     }
 
     public function getCredential(

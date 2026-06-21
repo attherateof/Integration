@@ -8,6 +8,8 @@ use MageStack\Integration\Model\Auth\AuthenticationPool;
 use MageStack\Integration\Model\IntegrationConfig;
 use Magento\Backend\Block\Widget\Form\Generic;
 use Magento\Framework\Data\Form as DataForm;
+use MageStack\Integration\Api\CredentialRepositoryInterface;
+use MageStack\Integration\Model\IntegrationContext;
 
 class Form extends Generic
 {
@@ -15,8 +17,10 @@ class Form extends Generic
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Framework\Registry $registry,
         \Magento\Framework\Data\FormFactory $formFactory,
+        private readonly CredentialRepositoryInterface $credentialRepository,
         private readonly IntegrationConfig $integrationConfig,
         private readonly AuthenticationPool $authenticationPool,
+        private readonly IntegrationContext $integrationContext,
         array $data = []
     ) {
         parent::__construct(
@@ -34,7 +38,7 @@ class Form extends Generic
             'data' => [
                 'id'     => 'magestack_credential_form',
                 'action' => $this->getUrl(
-                    'integration/index/save'
+                    'magestack_integration/credential/save'
                 ),
                 'method' => 'post'
             ]
@@ -42,62 +46,88 @@ class Form extends Generic
 
         $form->setUseContainer(true);
 
-        $apis = $this->integrationConfig->resolve()['apis'] ?? [];
+        $apiCode = $this->integrationContext->getApiCode();
+        $apiConfig = $this->integrationContext->getApiConfig();
 
-        if ($apis) {
-            foreach ($apis as $apiCode => $apiConfig) {
-                $authType = (string)(
-                    $apiConfig['authentication']['type']
-                    ?? 'no_auth'
-                );
+        if (!$apiCode || !$apiConfig) {
+            $this->setForm($form);
 
-                $provider = $this->authenticationPool->get(
-                    $authType
-                );
-
-                $fields = $provider->getConfigurationFields();
-
-                if (!$fields) {
-                    continue;
-                }
-
-                $fieldset = $form->addFieldset(
-                    'fieldset_' . $apiCode,
-                    [
-                        'legend' => __(
-                            '%1 Credentials',
-                            strtoupper($apiCode)
-                        )
-                    ]
-                );
-
-                foreach ($fields as $field) {
-
-                    $fieldset->addField(
-                        $apiCode . '_' . $field['code'],
-                        $field['type'],
-                        [
-                            'name' => sprintf(
-                                '[%s][%s]',
-                                $apiCode,
-                                $field['code']
-                            ),
-                            'label' => __(
-                                $field['label']
-                            ),
-                            'required' => (bool)(
-                                $field['required']
-                                ?? false
-                            ),
-                        ]
-                    );
-                }
-            }
+            return parent::_prepareForm();
         }
 
+        $websiteId = $this->getWebsiteId();
+
+        $savedCredentials = $this->credentialRepository
+            ->getByApiCodeAndWebsite(
+                $apiCode,
+                $websiteId
+            );
+
+        $authType = (string)(
+            $apiConfig['authentication']['type']
+            ?? 'no_auth'
+        );
+
+        $provider = $this->authenticationPool->get(
+            $authType
+        );
+
+        $fields = $provider->getConfigurationFields();
+
+        $form->addField(
+            'website_id',
+            'hidden',
+            [
+                'name'  => 'website_id',
+                'value' => $websiteId
+            ]
+        );
+
+        $form->addField(
+            'api_code',
+            'hidden',
+            [
+                'name'  => 'api_code',
+                'value' => $apiCode
+            ]
+        );
+
+        $fieldset = $form->addFieldset(
+            'fieldset_' . $apiCode,
+            [
+                'legend' => __(
+                    '%1 Credentials',
+                    $apiConfig['title'] ?? strtoupper($apiCode)
+                )
+            ]
+        );
+
+        foreach ($fields as $fieldName => $fieldConfig) {
+            $fieldset->addField(
+                $apiCode . '_' . $fieldName,
+                $fieldConfig['type'],
+                [
+                    'name' => sprintf(
+                        'credentials[%s][%s][%s]',
+                        $apiCode,
+                        $authType,
+                        $fieldName
+                    ),
+                    'label' => __($fieldConfig['label']),
+                    'class' => $fieldConfig['class'] ?? '',
+                    'autocomplete' => 'off',
+                    'value' => $savedCredentials[$fieldName] ?? ''
+                ]
+            );
+        }
 
         $this->setForm($form);
 
         return parent::_prepareForm();
+    }
+
+    public function getWebsiteId(): int
+    {
+        return (int)$this->getRequest()->getParam('website', 0);
     }
 }
