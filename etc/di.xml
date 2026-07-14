@@ -51,18 +51,25 @@
         for="MageStack\Integration\Api\Data\CredentialSearchResultsInterface"
         type="MageStack\Integration\Model\CredentialSearchResults"/>
 
-    <!-- <type name="MageStack\Integration\Model\Config\RequestBuilderPool">
+    <!-- Integration Cache Type Start -->
+    <type name="MageStack\Integration\Model\Cache\Type\Integration">
         <arguments>
-            <argument name="builders" xsi:type="array">
-                <item name="erp_default_get_user_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\InventoryRequestBuilderFactory</item>
-                <item name="erp_default_get_products_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\UserRequestBuilderFactory</item>
-                <item name="erp_default_sync_inventory_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\InventoryRequestBuilderFactory</item>
-                <item name="erp_default_export_order_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\UserRequestBuilderFactory</item>
-                <item name="erp_in_get_products_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\InventoryRequestBuilderFactory</item>
-                <item name="crm_default_get_customer_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\UserRequestBuilderFactory</item>
-                <item name="crm_default_search_customers_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\InventoryRequestBuilderFactory</item>
-                <item name="crm_default_create_lead_request_builder" xsi:type="object">Vendor\Module\Model\RequestBuilder\UserRequestBuilderFactory</item>
+            <argument name="cacheFrontendPool" xsi:type="object">Magento\Framework\App\Cache\Frontend\Pool</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\App\Cache\TypeListInterface">
+        <arguments>
+            <argument name="typeList" xsi:type="array">
+                <item name="integration_cache" xsi:type="string">MageStack\Integration\Model\Cache\Type\Integration</item>
             </argument>
         </arguments>
-    </type> -->
+    </type>
+
+    <type name="MageStack\Integration\Model\Cache\Repository">
+        <arguments>
+            <argument name="cacheFrontend" xsi:type="object">MageStack\Integration\Model\Cache\Type\Integration</argument>
+        </arguments>
+    </type>
+    <!-- Integration Cache Type End -->
 </config>

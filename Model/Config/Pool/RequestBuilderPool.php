@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MageStack\Integration\Model;
+namespace MageStack\Integration\Model\Config\Pool;
 
 use Magento\Framework\Exception\LocalizedException;
 use MageStack\Integration\Api\Config\RequestBuilderInterface;

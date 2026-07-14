@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:App/Cache/etc/cache.xsd">
+    <type name="integration_cache"
+          translate="label,description"
+          instance="MageStack\Integration\Model\Cache\Type\Integration">
+        <label>Integration Cache</label>
+        <description>Website-specific integration configuration cache</description>
+    </type>
+</config>

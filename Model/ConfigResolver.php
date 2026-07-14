@@ -5,18 +5,25 @@ declare(strict_types=1);
 namespace MageStack\Integration\Model;
 
 use InvalidArgumentException;
-use MageStack\Integration\Model\IntegrationConfig;
+use MageStack\Integration\Model\Cache\Repository as IntegrationCacheRepository;
 
 class ConfigResolver
 {
     public function __construct(
-        private readonly IntegrationConfig $config
+        private readonly IntegrationConfig $config,
+        private readonly IntegrationCacheRepository $cacheRepository
     ) {}
 
     public function resolve(
         string $apiCode,
         string $websiteCode
     ): array {
+        $cached = $this->cacheRepository->load($apiCode, $websiteCode);
+
+        if ($cached !== false) {
+            return $cached;
+        }
+
         $api = $this->config->resolve()['apis'][$apiCode] ?? null;
 
         if (!$api) {
@@ -27,18 +34,21 @@ class ConfigResolver
 
         $website = $api['websites'][$websiteCode] ?? [];
 
-        return [
-            'raw' => $this->config->resolve()['apis']
-            // 'enabled' => $api['enabled'] ?? true,
-            // 'authentication' => $this->resolveAuthentication(
-            //     $api,
-            //     $website
-            // ),
-            // 'endpoints' => $this->resolveEndpoints(
-            //     $api,
-            //     $website
-            // )
+        $resolved = [
+            'enabled' => $api['enabled'] ?? true,
+            'authentication' => $this->resolveAuthentication(
+                $api,
+                $website
+            ),
+            'endpoints' => $this->resolveEndpoints(
+                $api,
+                $website
+            )
         ];
+
+        $this->cacheRepository->save($resolved, $apiCode, $websiteCode);
+
+        return $resolved;
     }
 
     private function resolveAuthentication(
