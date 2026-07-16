@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Config/etc/config.xsd">
+    <default>
+        <magestack_integration>
+            <general>
+                <enabled>1</enabled>
+            </general>
+            <cron>
+                <schedule>*/5 * * * *</schedule>
+            </cron>
+        </magestack_integration>
+    </default>
+</config>

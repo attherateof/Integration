@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-
     <virtualType name="MageStack\Integration\Model\Config\Reader" type="Magento\Framework\Config\Reader\Filesystem">
         <arguments>
             <argument name="converter" xsi:type="object">MageStack\Integration\Model\Config\Converter</argument>
@@ -15,13 +14,11 @@
             </argument>
         </arguments>
     </virtualType>
-
     <type name="MageStack\Integration\Model\IntegrationConfig">
         <arguments>
             <argument name="reader" xsi:type="object">MageStack\Integration\Model\Config\Reader</argument>
         </arguments>
     </type>
-
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
@@ -29,7 +26,6 @@
             </argument>
         </arguments>
     </type>
-
     <type name="MageStack\Integration\Model\Auth\AuthenticationPool">
         <arguments>
             <argument name="providers" xsi:type="array">
@@ -38,7 +34,6 @@
             </argument>
         </arguments>
     </type>
-
     <preference
         for="MageStack\Integration\Api\Data\CredentialInterface"
         type="MageStack\Integration\Model\Credential"/>
@@ -57,7 +52,6 @@
             <argument name="cacheFrontendPool" xsi:type="object">Magento\Framework\App\Cache\Frontend\Pool</argument>
         </arguments>
     </type>
-
     <type name="Magento\Framework\App\Cache\TypeListInterface">
         <arguments>
             <argument name="typeList" xsi:type="array">
@@ -72,4 +66,29 @@
         </arguments>
     </type>
     <!-- Integration Cache Type End -->
+    <type name="Magento\Setup\Console\Command\DiCompileCommand">
+        <plugin name="mgs_integration_refresh_on_di_compile" type="MageStack\Integration\Plugin\Setup\DiCompilePlugin" />
+    </type>
+    <!-- API Service Wiring -->
+    <type name="MageStack\Integration\Model\Api\ResponseCacheRepository">
+        <arguments>
+            <argument name="cacheFrontend" xsi:type="object">MageStack\Integration\Model\Cache\Type\Integration</argument>
+        </arguments>
+    </type>
+    <type name="MageStack\Integration\Model\Api\CacheManager">
+        <arguments>
+            <argument name="cacheRepository" xsi:type="object">MageStack\Integration\Model\Api\ResponseCacheRepository</argument>
+        </arguments>
+    </type>
+    <type name="MageStack\Integration\Model\IntegrationApi">
+        <arguments>
+            <argument name="requestBuilderPool" xsi:type="object">MageStack\Integration\Model\Config\Pool\RequestBuilderPool</argument>
+            <argument name="responseValidatorPool" xsi:type="object">MageStack\Integration\Model\Config\Pool\ResponseValidatorPool</argument>
+            <argument name="responseHandlerPool" xsi:type="object">MageStack\Integration\Model\Config\Pool\ResponseHandlerPool</argument>
+        </arguments>
+    </type>
+    <preference for="MageStack\Integration\Api\Data\ApiAttemptInterface" type="MageStack\Integration\Model\ApiAttempt" />
+    <type name="Magento\Backend\Model\Menu\Builder">
+        <plugin name="mgs_integration_hide_menu_if_disabled" type="MageStack\Integration\Plugin\Admin\Menu\HideIfDisabled" />
+    </type>
 </config>
