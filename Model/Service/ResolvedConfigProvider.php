@@ -12,6 +12,7 @@ use MageStack\Integration\Model\Config\Pool\ResponseValidatorPool;
 use MageStack\Integration\Api\Config\RequestBuilderInterface;
 use MageStack\Integration\Api\Config\ResponseValidatorInterface;
 use MageStack\Integration\Api\Config\ResponseHandlerInterface;
+use MageStack\Integration\Model\Auth\AuthenticationPool;
 
 class ResolvedConfigProvider
 {
@@ -27,11 +28,22 @@ class ResolvedConfigProvider
         'OPTIONS'
     ];
 
+    private const VALID_HTTP_CODE_START_FROM = 100;
+
+    private const VALID_HTTP_CODE_END_AT = 599;
+
+    private const DEFAULT_BACKOFF_MULTIPLIER = 1;
+
+    private const DEFAULT_MAX_ATTEMPTS = 0;
+
+    private const TOKEN_TTL = 3600;
+
     public function __construct(
         private readonly ConfigResolver $configResolver,
         private readonly RequestBuilderPool $requestBuilderPool,
         private readonly ResponseValidatorPool $responseValidatorPool,
         private readonly ResponseHandlerPool $responseHandlerPool,
+        private readonly AuthenticationPool $authenticationPool
     ) {}
 
     /**
@@ -52,7 +64,7 @@ class ResolvedConfigProvider
             );
         }
 
-        if (!($this->configCache[$key] ?? false)) {
+        if (!($this->configCache[$key]['enabled'] ?? false)) {
             throw new LocalizedException(
                 __('API "%1" is disabled.', $apiCode)
             );
@@ -82,6 +94,20 @@ class ResolvedConfigProvider
         }
 
         return $config['authentication'];
+    }
+
+    private function getAuthenticationValue(
+        string $apiCode,
+        string $websiteCode,
+        string $key,
+        mixed $default = null
+    ): mixed {
+        $authentication = $this->getAuthenticationConfig(
+            $apiCode,
+            $websiteCode
+        );
+
+        return $authentication[$key] ?? $default;
     }
 
     /**
@@ -224,7 +250,14 @@ class ResolvedConfigProvider
         );
 
         if ($timeout <= $minTimeout) {
-            $timeout = $minTimeout;
+            throw new LocalizedException(
+                __(
+                    'Invalid timeout "%1" configured for endpoint "%2". Must be greater than %3 seconds.',
+                    $timeout,
+                    $endpointCode,
+                    $minTimeout
+                )
+            );
         }
 
         return $timeout;
@@ -285,8 +318,8 @@ class ResolvedConfigProvider
             'key_prefix'
         );
 
-        if ($prefix !== null && $prefix !== '') {
-            return $apiCode . '_' . $endpointCode . '_' . $websiteCode . '_' . (string)$prefix;
+        if (is_string($prefix) && $prefix !== '') {
+            return (string)$prefix;
         }
 
         return null;
@@ -312,11 +345,10 @@ class ResolvedConfigProvider
         string $endpointCode,
         string $websiteCode
     ): int {
-        $defaultMaxAttempts = 0;
 
         if ($this->isEndpointRetryEnabled($apiCode, $endpointCode, $websiteCode) === false) {
 
-            return $defaultMaxAttempts;
+            return self::DEFAULT_MAX_ATTEMPTS;
         }
 
         $maxAttempts = (int)$this->getEndpointNestedValue(
@@ -325,11 +357,18 @@ class ResolvedConfigProvider
             $websiteCode,
             'retry',
             'max_attempts',
-            $defaultMaxAttempts
+            self::DEFAULT_MAX_ATTEMPTS
         );
 
-        if ($maxAttempts < $defaultMaxAttempts) {
-            $maxAttempts = $defaultMaxAttempts;
+        if ($maxAttempts < self::DEFAULT_MAX_ATTEMPTS) {
+            throw new LocalizedException(
+                __(
+                    'Invalid max attempts "%1" configured for endpoint "%2". Must be greater than or equal to %3.',
+                    $maxAttempts,
+                    $endpointCode,
+                    self::DEFAULT_MAX_ATTEMPTS
+                )
+            );
         }
 
         return $maxAttempts;
@@ -340,10 +379,9 @@ class ResolvedConfigProvider
         string $endpointCode,
         string $websiteCode
     ): int {
-        $defaultBackoffMultiplier = 1;
         if ($this->isEndpointRetryEnabled($apiCode, $endpointCode, $websiteCode) === false) {
 
-            return $defaultBackoffMultiplier;
+            return self::DEFAULT_BACKOFF_MULTIPLIER;
         }
         $backoffMultiplier = (int)$this->getEndpointNestedValue(
             $apiCode,
@@ -351,11 +389,18 @@ class ResolvedConfigProvider
             $websiteCode,
             'retry',
             'backoff_multiplier',
-            $defaultBackoffMultiplier
+            self::DEFAULT_BACKOFF_MULTIPLIER
         );
 
-        if ($backoffMultiplier < $defaultBackoffMultiplier) {
-            $backoffMultiplier = $defaultBackoffMultiplier;
+        if ($backoffMultiplier < self::DEFAULT_BACKOFF_MULTIPLIER) {
+            throw new LocalizedException(
+                __(
+                    'Invalid backoff multiplier "%1" configured for endpoint "%2". Must be greater than or equal to %3.',
+                    $backoffMultiplier,
+                    $endpointCode,
+                    self::DEFAULT_BACKOFF_MULTIPLIER
+                )
+            );
         }
 
         return $backoffMultiplier;
@@ -377,7 +422,7 @@ class ResolvedConfigProvider
 
         $codes = array_map('intval', $codes);
         foreach ($codes as $code) {
-            if ($code < 100 || $code > 599) {
+            if ($code < self::VALID_HTTP_CODE_START_FROM || $code > self::VALID_HTTP_CODE_END_AT) {
                 throw new LocalizedException(
                     __(
                         'Invalid HTTP status code "%1" configured for endpoint "%2".',
@@ -388,7 +433,7 @@ class ResolvedConfigProvider
             }
         }
 
-        return $codes;
+        return array_values(array_unique($codes));
     }
 
     public function getEndpointRequestBuilder(
@@ -396,14 +441,14 @@ class ResolvedConfigProvider
         string $endpointCode,
         string $websiteCode
     ): RequestBuilderInterface {
-        $requestBuilderIdentifier = (string)$this->getEndpointValue(
+        $requestBuilderIdentifier = $this->getEndpointValue(
             $apiCode,
             $endpointCode,
             $websiteCode,
             'request_builder'
         );
 
-        if ($requestBuilderIdentifier === '' || $requestBuilderIdentifier == null) {
+        if (!is_string($requestBuilderIdentifier)) {
             throw new LocalizedException(
                 __(
                     'Request builder identifier for "%1" is missing required configuration "%2".',
@@ -413,7 +458,7 @@ class ResolvedConfigProvider
             );
         }
 
-        return $this->requestBuilderPool->get($requestBuilderIdentifier);
+        return $this->requestBuilderPool->get((string)$requestBuilderIdentifier);
     }
 
     public function getEndpointResponseValidator(
@@ -428,7 +473,7 @@ class ResolvedConfigProvider
             'response_validator'
         );
 
-        if ($validatorIdentifier) {
+        if (is_string($validatorIdentifier) && $validatorIdentifier !== '') {
             return $this->responseValidatorPool->get((string)$validatorIdentifier);
         }
 
@@ -447,10 +492,81 @@ class ResolvedConfigProvider
             'response_handler'
         );
 
-        if ($handlerIdentifier) {
+        if (is_string($handlerIdentifier) && $handlerIdentifier !== '') {
             return $this->responseHandlerPool->get((string)$handlerIdentifier);
         }
 
         return null;
+    }
+
+    public function getAuthenticationType(
+        string $apiCode,
+        string $websiteCode
+    ): string {
+        $type = strtolower((string)$this->getAuthenticationValue(
+            $apiCode,
+            $websiteCode,
+            'type'
+        ));
+
+        $supportedTypes = $this->authenticationPool->supportedTypes();
+
+        if (!in_array($type, $supportedTypes, true)) {
+            throw new LocalizedException(
+                __(
+                    'Unsupported authentication type "%1" configured for API "%2".',
+                    $type,
+                    $apiCode
+                )
+            );
+        }
+
+        return $type;
+    }
+
+    public function getTokenEndpoint(
+        string $apiCode,
+        string $websiteCode
+    ): string {
+        $endpoint = $this->getAuthenticationValue(
+            $apiCode,
+            $websiteCode,
+            'token_endpoint'
+        );
+
+        if (!is_string($endpoint) || $endpoint === '') {
+            throw new LocalizedException(
+                __(
+                    'Token endpoint is not configured for API "%1".',
+                    $apiCode
+                )
+            );
+        }
+
+        return $endpoint;
+    }
+
+    public function getTokenTtl(
+        string $apiCode,
+        string $websiteCode
+    ): int {
+        $ttl = (int)$this->getAuthenticationValue(
+            $apiCode,
+            $websiteCode,
+            'token_ttl',
+            self::TOKEN_TTL
+        );
+
+        if ($ttl <= 0) {
+            throw new LocalizedException(
+                __(
+                    'Invalid token TTL "%1" configured for API "%2".',
+                    $ttl,
+                    $apiCode
+                )
+            );
+        }
+
+        return $ttl;
     }
 }

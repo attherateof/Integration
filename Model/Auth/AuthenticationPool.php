@@ -26,4 +26,9 @@ class AuthenticationPool
 
         return $this->providers[$type];
     }
+
+    public function supportedTypes(): array
+    {
+        return array_map('strtolower', array_keys($this->providers));
+    }
 }
