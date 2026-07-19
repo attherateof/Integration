@@ -163,16 +163,6 @@ class ResolvedConfigProvider
         string $websiteCode
     ): string {
 
-        $allowedMethods = [
-            'GET',
-            'POST',
-            'PUT',
-            'PATCH',
-            'DELETE',
-            'HEAD',
-            'OPTIONS'
-        ];
-
         $method = strtoupper((string)$this->getEndpointValue(
             $apiCode,
             $endpointCode,
@@ -180,7 +170,7 @@ class ResolvedConfigProvider
             'method'
         ));
 
-        if (!in_array($method, $allowedMethods, true)) {
+        if (!in_array($method, self::HTTP_METHODS, true)) {
             throw new LocalizedException(
                 __(
                     'Invalid HTTP method "%1" configured for endpoint "%2".',
