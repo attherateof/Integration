@@ -18,7 +18,7 @@ class ResolvedConfigProvider
 {
     private array $configCache = [];
 
-    private const HTTP_METHODS = [
+    public const HTTP_METHODS = [
         'GET',
         'POST',
         'PUT',
@@ -27,6 +27,9 @@ class ResolvedConfigProvider
         'HEAD',
         'OPTIONS'
     ];
+
+    /** timeout, connection failure, etc. */
+    private const SYSTEM_FAILURE_CODE = 0;
 
     private const VALID_HTTP_CODE_START_FROM = 100;
 
@@ -433,7 +436,7 @@ class ResolvedConfigProvider
             }
         }
 
-        return array_values(array_unique($codes));
+        return array_values(array_unique(array_merge([self::SYSTEM_FAILURE_CODE], $codes)));
     }
 
     public function getEndpointRequestBuilder(
