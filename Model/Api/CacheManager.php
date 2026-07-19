@@ -55,17 +55,17 @@ class CacheManager
         array $payload,
         array $urlParams
     ): string {
+        $key = $apiCode
+            . '_' . $endpointCode
+            . '_' . $websiteCode
+            . '_' . $this->normalizeValue($payload)
+            . '_' . $this->normalizeValue($urlParams);
+
         if ($keyPrefix !== '') {
-            return $keyPrefix;
+            $key = $keyPrefix . '_' . $key;
         }
 
-        return md5(
-            $apiCode
-                . '|' . $endpointCode
-                . '|' . $websiteCode
-                . '|' . $this->normalizeValue($payload)
-                . '|' . $this->normalizeValue($urlParams)
-        );
+        return md5($key);
     }
 
     private function normalizeValue(array $data): string

@@ -51,7 +51,7 @@ class ResolvedConfigProvider
      *
      * @throws LocalizedException
      */
-    private function getApiConfig(
+    public function getApiConfig(
         string $apiCode,
         string $websiteCode
     ): array {

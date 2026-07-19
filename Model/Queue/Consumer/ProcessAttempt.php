@@ -6,15 +6,17 @@ namespace MageStack\Integration\Model\Queue\Consumer;
 
 use Magento\Framework\Exception\NoSuchEntityException;
 use MageStack\Integration\Model\ApiAttemptRepository;
-use MageStack\Integration\Model\IntegrationApi;
+use MageStack\Integration\Model\Service\Integration\IntegrationBuilderFactory;
+use MageStack\Integration\Model\Service\Integration\IntegrationManager;
 use MageStack\Integration\Model\ConfigResolver;
 use Psr\Log\LoggerInterface;
 
 class ProcessAttempt
 {
     public function __construct(
+        private readonly IntegrationBuilderFactory $integrationBuilderFactory,
         private readonly ApiAttemptRepository $attemptRepository,
-        private readonly IntegrationApi $integrationApi,
+        private readonly IntegrationManager $integrationManager,
         private readonly ConfigResolver $configResolver,
         private readonly LoggerInterface $logger
     ) {}
@@ -70,7 +72,7 @@ class ProcessAttempt
         $websiteCode = $payload['website_code'] ?? null;
         $callPayload = $payload['payload'] ?? [];
         $callUrlParams = $payload['url_params'] ?? [];
-        $attemptNumber = (int) ($payload['attempt'] ?? 0);
+        $attemptNumber = (int) ($payload['attempt'] ?? 0) + 1;
 
         if (empty($apiCode) || empty($endpointCode) || empty($websiteCode)) {
             $this->logger->warning('ProcessAttempt payload missing required api_code, endpoint_code or website_code.');
@@ -78,14 +80,17 @@ class ProcessAttempt
         }
 
         try {
-            $response = $this->integrationApi
-                ->setApi($apiCode)
+            $integrationBuilder = $this->integrationBuilderFactory->create();
+
+            $integrationBuilder->setApi($apiCode)
                 ->setEndpoint($endpointCode)
                 ->setWebsiteCode($websiteCode)
-                ->setPayload(is_array($callPayload) ? $callPayload : [])
+                ->setData(is_array($callPayload) ? $callPayload : [])
                 ->setUrlParams(is_array($callUrlParams) ? $callUrlParams : [])
-                ->setAttempt($attemptNumber)
-                ->trigger();
+                ->setHeaders([])
+                ->setAttempt($attemptNumber);
+
+            $response = $this->integrationManager->trigger($integrationBuilder);
 
             $statusCode = (int) ($response['status'] ?? 0);
 

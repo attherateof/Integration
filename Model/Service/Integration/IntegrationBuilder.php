@@ -6,7 +6,7 @@ namespace MageStack\Integration\Model\Service\Integration;
 
 use InvalidArgumentException;
 
-class RequestBuilder
+class IntegrationBuilder
 {
     private ?string $apiCode = null;
 
@@ -15,12 +15,14 @@ class RequestBuilder
     private ?string $websiteCode = null;
 
     private array $data = [];
+    private array $urlParams = [];
+    private array $headers = [];
 
     private int $attempt = 0;
 
     public function setApiCode(string $apiCode): self
     {
-        if ($this->apiCode === '') {
+        if ($apiCode === '') {
             throw new InvalidArgumentException('API code is required.');
         }
 
@@ -31,7 +33,7 @@ class RequestBuilder
 
     public function setEndpointCode(string $endpointCode): self
     {
-        if ($this->endpointCode === '') {
+        if ($endpointCode === '') {
             throw new InvalidArgumentException('Endpoint code is required.');
         }
 
@@ -42,7 +44,7 @@ class RequestBuilder
 
     public function setWebsiteCode(string $websiteCode): self
     {
-        if ($this->websiteCode === null || $this->websiteCode === '') {
+        if ($websiteCode === '') {
             throw new InvalidArgumentException('Website code is required.');
         }
 
@@ -51,16 +53,30 @@ class RequestBuilder
         return $this;
     }
 
-    public function setData(array $input): self
+    public function setData(array $data): self
     {
-        $this->data = $input;
+        $this->data = $data;
+
+        return $this;
+    }
+
+    public function setUrlParams(array $urlParams): self
+    {
+        $this->urlParams = $urlParams;
+
+        return $this;
+    }
+
+    public function setHeaders(array $headers): self
+    {
+        $this->headers = $headers;
 
         return $this;
     }
 
     public function setAttempt(int $attempt = 0): self
     {
-        if ($this->attempt < 0) {
+        if ($attempt < 0) {
             throw new InvalidArgumentException('Attempt cannot be negative.');
         }
 
@@ -85,9 +101,19 @@ class RequestBuilder
         return $this->websiteCode;
     }
 
-    public function getInput(): array
+    public function getData(): array
     {
         return $this->data;
+    }
+
+    public function getHeaders(): array
+    {
+        return $this->headers ?? [];
+    }
+
+    public function getUrlParams(): array
+    {
+        return $this->urlParams ?? [];
     }
 
     public function getAttempt(): int
