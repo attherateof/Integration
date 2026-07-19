@@ -123,7 +123,7 @@ class IntegrationApi
                 return $cached;
             }
         }
-
+        // TODO:: Not now,in future, resolve and merge authentication header along with $requestHeaders, alse throw excepton
         $response = $this->executeCall($endpointConfig, $requestPayload, $requestUrlParams, $requestHeaders, $resolvedConfig);
 
         $this->handleRetryIfNeeded($response, $endpointConfig, $requestPayload, $requestUrlParams, $requestHeaders);

@@ -32,7 +32,8 @@
         </xs:sequence>
         <xs:attribute name="enabled" type="xs:boolean" use="optional"/>
         <xs:attribute name="max_attempts" type="xs:int" use="optional"/>
-        <xs:attribute name="initial_delay" type="xs:int" use="optional"/> // not needed, will be removed in future versions
+        <!-- not needed, will be removed in future versions -->
+        <xs:attribute name="initial_delay" type="xs:int" use="optional"/> 
         <xs:attribute name="backoff_multiplier" type="xs:int" use="optional"/>
     </xs:complexType>
     <xs:complexType name="cacheType">

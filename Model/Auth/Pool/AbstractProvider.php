@@ -6,8 +6,7 @@ namespace MageStack\Integration\Model\Auth\Pool;
 
 use MageStack\Integration\Api\Auth\AuthenticationProviderInterface;
 
-abstract class AbstractProvider
-implements AuthenticationProviderInterface
+abstract class AbstractProvider implements AuthenticationProviderInterface
 {
     public function buildHeaders(
         array $apiConfig,

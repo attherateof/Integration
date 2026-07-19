@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- custom xml file registration start-->
     <virtualType name="MageStack\Integration\Model\Config\Reader" type="Magento\Framework\Config\Reader\Filesystem">
         <arguments>
             <argument name="converter" xsi:type="object">MageStack\Integration\Model\Config\Converter</argument>
@@ -19,6 +20,7 @@
             <argument name="reader" xsi:type="object">MageStack\Integration\Model\Config\Reader</argument>
         </arguments>
     </type>
+    <!-- custom xml file registration end-->
     <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument name="commands" xsi:type="array">
@@ -37,7 +39,6 @@
     <preference
         for="MageStack\Integration\Api\Data\CredentialInterface"
         type="MageStack\Integration\Model\Credential"/>
-
     <preference
         for="MageStack\Integration\Api\CredentialRepositoryInterface"
         type="MageStack\Integration\Model\CredentialRepository"/>
@@ -59,7 +60,6 @@
             </argument>
         </arguments>
     </type>
-
     <type name="MageStack\Integration\Model\Cache\Repository">
         <arguments>
             <argument name="cacheFrontend" xsi:type="object">MageStack\Integration\Model\Cache\Type\Integration</argument>
