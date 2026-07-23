@@ -212,6 +212,21 @@ class ResolvedConfigProvider
         return $method;
     }
 
+    public function isEndpointForGuest(
+        string $apiCode,
+        string $endpointCode,
+        string $websiteCode
+    ): bool {
+        return (bool)$this->getEndpointNestedValue(
+            $apiCode,
+            $endpointCode,
+            $websiteCode,
+            'retry',
+            'enabled',
+            false
+        );
+    }
+
     public function getEndpointPath(
         string $apiCode,
         string $endpointCode,

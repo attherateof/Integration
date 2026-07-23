@@ -91,6 +91,16 @@ class ConfigResolver
         return $resolved;
     }
 
+    /**
+     * format config
+     *
+     * @param string $endpointCode
+     * @param array $globalEndpoint
+     * @param array $websiteEndpoint
+     * @param array $api
+     * @param array $website
+     * @return array
+     */
     private function resolveEndpoint(
         string $endpointCode,
         array $globalEndpoint,
@@ -114,6 +124,7 @@ class ConfigResolver
                 $baseUrl,
                 $endpoint['path'] ?? ''
             ),
+            'guest' => $endpoint['guest'] ?? false,
             'enabled' => $endpoint['enabled']
                 ?? true,
             'timeout' => $endpoint['timeout']
@@ -179,7 +190,6 @@ class ConfigResolver
         return [
             'enabled' => $retry['enabled'] ?? false,
             'max_attempts' => $retry['max_attempts'] ?? null,
-            'initial_delay' => $retry['initial_delay'] ?? null,
             'backoff_multiplier' => $retry['backoff_multiplier'] ?? null,
             'http_codes' => $retry['http_codes'] ?? [],
         ];

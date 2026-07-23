@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MageStack\Integration\Api\Auth;
 
+use MageStack\Integration\Model\Service\Integration\IntegrationBuilder;
+
 interface AuthenticationProviderInterface
 {
     /**
@@ -13,18 +15,17 @@ interface AuthenticationProviderInterface
 
     /**
      * Return headers.
+     * TODO:: change method name to get auth credentials or more suitable one
      */
     public function buildHeaders(
-        array $apiConfig,
-        int $websiteId
+        IntegrationBuilder $integrationRequest
     ): array;
 
     /**
      * Return query params if auth is passed via URL.
      */
     public function buildQueryParams(
-        array $apiConfig,
-        int $websiteId
+        IntegrationBuilder $integrationRequest
     ): array;
 
     /**

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MageStack\Integration\Model\Config;
 
-use DOMAttr;
 use DOMDocument;
 use DOMElement;
 use Magento\Framework\Config\ConverterInterface;
@@ -40,12 +39,12 @@ class Converter implements ConverterInterface
     private const ATTR_ENABLED = 'enabled';
     private const ATTR_METHOD = 'method';
     private const ATTR_PATH = 'path';
+    private const ATTR_GUEST = 'guest';
     private const ATTR_TIMEOUT = 'timeout';
     private const ATTR_TYPE = 'type';
     private const ATTR_TOKEN_ENDPOINT = 'token_endpoint';
     private const ATTR_TOKEN_TTL = 'token_ttl';
     private const ATTR_MAX_ATTEMPTS = 'max_attempts';
-    private const ATTR_INITIAL_DELAY = 'initial_delay';
     private const ATTR_BACKOFF_MULTIPLIER = 'backoff_multiplier';
     private const ATTR_TTL = 'ttl';
     private const ATTR_KEY_PREFIX = 'key_prefix';
@@ -74,7 +73,6 @@ class Converter implements ConverterInterface
     private const RETRY_ATTRIBUTES = [
         self::ATTR_ENABLED,
         self::ATTR_MAX_ATTEMPTS,
-        self::ATTR_INITIAL_DELAY,
         self::ATTR_BACKOFF_MULTIPLIER,
     ];
 
@@ -170,6 +168,7 @@ class Converter implements ConverterInterface
         return [
             self::ATTR_METHOD => $node->getAttribute(self::ATTR_METHOD) ?: null,
             self::ATTR_PATH => $node->getAttribute(self::ATTR_PATH) ?: null,
+            self::ATTR_GUEST => $this->getOptionalBoolAttribute($node, self::ATTR_GUEST) ?? false,
             self::ATTR_ENABLED => $this->getOptionalBoolAttribute($node, self::ATTR_ENABLED),
             self::ATTR_TIMEOUT => $this->getOptionalIntAttribute($node, self::ATTR_TIMEOUT),
 

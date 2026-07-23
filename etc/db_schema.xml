@@ -91,9 +91,9 @@
                 nullable="true"
                 comment="URL Parameters"/>
         <column xsi:type="text"
-                name="payload"
+                name="data"
                 nullable="true"
-                comment="input payload"/>
+                comment="input data"/>
         <column xsi:type="int"
                 name="attempt"
                 nullable="false"

@@ -11,6 +11,8 @@ use MageStack\Integration\Model\Service\Integration\EndpointCache;
 use MageStack\Integration\Model\Service\Integration\HttpCallExecutor;
 use MageStack\Integration\Model\Service\Integration\RetryHandler;
 use MageStack\Integration\Model\Service\Integration\ResponseProcessor;
+use MageStack\Integration\Model\Service\Integration\IntegrationBuilder;
+use MageStack\Integration\Model\Service\Integration\AuthHeaderProvider;
 
 /**
  * Orchestrates a single API trigger by sequencing request assembly,
@@ -26,7 +28,8 @@ class IntegrationManager
         private readonly EndpointCache $endpointCache,
         private readonly HttpCallExecutor $httpCallExecutor,
         private readonly RetryHandler $retryHandler,
-        private readonly ResponseProcessor $responseProcessor
+        private readonly ResponseProcessor $responseProcessor,
+        private readonly AuthHeaderProvider $authHeaderProvider
     ) {}
 
     public function trigger(IntegrationBuilder $request): array
@@ -41,7 +44,7 @@ class IntegrationManager
 
         $websiteId = (int) $this->storeManager->getWebsite($websiteCode)->getId();
 
-        [$requestPayload, $requestUrlParams, $requestHeaders] = $this->requestAssembler->assemble(
+        [$requestPayload, $requestUrlParams, $headers] = $this->requestAssembler->assemble(
             $websiteId,
             $apiCode,
             $endpointCode,
@@ -60,14 +63,18 @@ class IntegrationManager
             }
         }
 
-        // TODO:: Not now, in future, resolve and merge authentication header along with $requestHeaders, also throw exception in case of error
+        $headers = $this->authHeaderProvider->get(
+            $request,
+            $headers
+        );
+
         $response = $this->httpCallExecutor->execute(
             $apiCode,
             $endpointCode,
             $websiteCode,
             $requestPayload,
             $requestUrlParams,
-            $requestHeaders,
+            $headers,
             $payload
         );
 

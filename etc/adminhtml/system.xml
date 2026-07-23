@@ -1,19 +1,40 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <section id="magestack_integration" translate="label" sortOrder="900" showInDefault="1" showInWebsite="1" showInStore="0">
-            <label>MageStack Integration</label>
-            <tab>mage</tab>
-            <resource>MageStack_Integration::integration</resource>
-
-            <group id="general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+        <section 
+        id="magestack_integration" 
+        translate="label" 
+        type="text" 
+        sortOrder="200" 
+        showInDefault="1" 
+        showInWebsite="0" 
+        showInStore="0">
+            <class>separator-top</class>
+            <label>Integration</label>
+            <tab>mage_stack_tab</tab>
+            <resource>MageStack_StoreGroupSwitcher::store_group_switcher</resource>
+            <group 
+            id="general" 
+            translate="label" 
+            type="text" 
+            sortOrder="10" 
+            showInDefault="1" 
+            showInWebsite="0" 
+            showInStore="0">
                 <label>General</label>
-                <field id="enabled" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
-                    <label>Enabled</label>
+                <field 
+                    id="enabled" 
+                    translate="label" 
+                    type="select" 
+                    showInDefault="1"  
+                    showInWebsite="0" 
+                    showInStore="0"
+                    canRestore="1" 
+                    sortOrder="10">
+                    <label>Is enabled?</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
-            <!-- will add max attempt config value as a dropdown upto 1 - 5 -->
             <group id="cron" translate="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Cron</label>
                 <field id="schedule" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">

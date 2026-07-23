@@ -7,38 +7,64 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:simpleType name="httpMethodType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="GET"/>
+            <xs:enumeration value="POST"/>
+            <xs:enumeration value="PUT"/>
+            <xs:enumeration value="PATCH"/>
+            <xs:enumeration value="DELETE"/>
+            <xs:enumeration value="HEAD"/>
+            <xs:enumeration value="OPTIONS"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="configIdentifierType">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="64"/>
+            <xs:pattern value="[a-z]([a-z0-9]*(_[a-z0-9]+)*)"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="httpStatusCodeType">
+        <xs:restriction base="xs:positiveInteger">
+            <xs:minInclusive value="100"/>
+            <xs:maxInclusive value="599"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="positiveDecimalType">
+        <xs:restriction base="xs:decimal">
+            <xs:minExclusive value="0"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:complexType name="apiType">
         <xs:sequence>
             <xs:element name="title" type="xs:string"/>
-            <xs:element name="base_url" type="xs:string"/>
+            <xs:element name="base_url" type="xs:anyURI"/>
             <xs:element name="authentication" type="authenticationType" minOccurs="0"/>
-            <xs:element name="timeout" type="xs:int" minOccurs="0"/>
+            <xs:element name="timeout" type="xs:positiveInteger"/>
             <xs:element name="retry" type="retryType" minOccurs="0"/>
             <xs:element name="cache" type="cacheType" minOccurs="0"/>
             <xs:element name="endpoints" type="endpointsType" minOccurs="0"/>
             <xs:element name="websites" type="websitesType" minOccurs="0"/>
         </xs:sequence>
-        <xs:attribute name="id" type="xs:string" use="required"/>
-        <xs:attribute name="enabled" type="xs:boolean" use="optional"/>
+        <xs:attribute name="id" type="configIdentifierType" use="required"/>
+        <xs:attribute name="enabled" type="xs:boolean" use="optional" default="true"/>
     </xs:complexType>
     <xs:complexType name="authenticationType">
-        <xs:attribute name="type" type="xs:string" use="optional"/>
+        <xs:attribute name="type" type="xs:string" use="required"/>
         <xs:attribute name="token_endpoint" type="xs:string" use="optional"/>
-        <xs:attribute name="token_ttl" type="xs:int" use="optional"/>
+        <xs:attribute name="token_ttl" type="xs:positiveInteger" use="optional" default="3600"/>
     </xs:complexType>
     <xs:complexType name="retryType">
         <xs:sequence>
-            <xs:element name="http_code" type="xs:int" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="http_code" type="httpStatusCodeType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
-        <xs:attribute name="enabled" type="xs:boolean" use="optional"/>
-        <xs:attribute name="max_attempts" type="xs:int" use="optional"/>
-        <!-- not needed, will be removed in future versions -->
-        <xs:attribute name="initial_delay" type="xs:int" use="optional"/> 
-        <xs:attribute name="backoff_multiplier" type="xs:int" use="optional"/>
+        <xs:attribute name="enabled" type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="max_attempts" type="xs:positiveInteger" use="optional" default="3"/>
+        <xs:attribute name="backoff_multiplier" type="positiveDecimalType" use="optional" default="2.0"/>
     </xs:complexType>
     <xs:complexType name="cacheType">
-        <xs:attribute name="enabled" type="xs:boolean" use="optional"/>
-        <xs:attribute name="ttl" type="xs:int" use="optional"/>
+        <xs:attribute name="enabled" type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="ttl" type="xs:positiveInteger" use="optional" default="3600"/>
         <xs:attribute name="key_prefix" type="xs:string" use="optional"/>
     </xs:complexType>
     <xs:complexType name="endpointsType">
@@ -54,11 +80,12 @@
             <xs:element name="response_handler" type="xs:string" minOccurs="0"/>
             <xs:element name="response_validator" type="xs:string" minOccurs="0"/>
         </xs:sequence>
-        <xs:attribute name="id" type="xs:string" use="required"/>
-        <xs:attribute name="method" type="xs:string" use="optional"/>
-        <xs:attribute name="path" type="xs:string" use="optional"/>
-        <xs:attribute name="enabled" type="xs:boolean" use="optional"/>
-        <xs:attribute name="timeout" type="xs:int" use="optional"/>
+        <xs:attribute name="id" type="configIdentifierType" use="required"/>
+        <xs:attribute name="path" type="xs:string" use="required"/>
+        <xs:attribute name="guest" type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="method" type="httpMethodType" use="optional" default="GET"/>
+        <xs:attribute name="enabled" type="xs:boolean" use="optional" default="true"/>
+        <xs:attribute name="timeout" type="xs:positiveInteger" use="optional" default="30"/>
     </xs:complexType>
     <xs:complexType name="websitesType">
         <xs:sequence>
@@ -67,13 +94,13 @@
     </xs:complexType>
     <xs:complexType name="websiteType">
         <xs:sequence>
-            <xs:element name="base_url" type="xs:string" minOccurs="0"/>
+            <xs:element name="base_url" type="xs:anyURI" minOccurs="0"/>
             <xs:element name="authentication" type="authenticationType" minOccurs="0"/>
-            <xs:element name="timeout" type="xs:int" minOccurs="0"/>
+            <xs:element name="timeout" type="xs:positiveInteger" minOccurs="0"/>
             <xs:element name="retry" type="retryType" minOccurs="0"/>
             <xs:element name="cache" type="cacheType" minOccurs="0"/>
             <xs:element name="endpoints" type="endpointsType" minOccurs="0"/>
         </xs:sequence>
-        <xs:attribute name="code" type="xs:string" use="required"/>
+        <xs:attribute name="code" type="configIdentifierType" use="required"/>
     </xs:complexType>
 </xs:schema>

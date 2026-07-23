@@ -24,6 +24,12 @@ class AuthenticationPool
             );
         }
 
+        if (!$this->providers[$type] instanceof AuthenticationProviderInterface) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('Authentication type "%1" is not a valid provider.', $type)
+            );
+        }
+
         return $this->providers[$type];
     }
 

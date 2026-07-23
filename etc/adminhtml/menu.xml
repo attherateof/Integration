@@ -1,7 +1,14 @@
-<?xml version="1.0" ?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
-	<menu>
-		<add id="MageStack::top_level" title="MageStack" module="MageStack_Integration" sortOrder="90" resource="Magento_Backend::content"/>
-		<add id="MageStack_Integration::index_edit" title="Api Configurations" module="MageStack_Integration" sortOrder="90" resource="MageStack_Integration::index_edit" parent="MageStack::top_level" action="magestack_integration/credential/index"/>
-	</menu>
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add
+            id="MageStack_Integration::index_edit"
+            title="API Configurations"
+            module="MageStack_Integration"
+            parent="MageStack_Core::root_menu"
+            sortOrder="10"
+            action="magestack_integration/credential/index"
+            resource="MageStack_Integration::index_edit"/>
+    </menu>
 </config>

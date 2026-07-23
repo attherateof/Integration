@@ -31,8 +31,8 @@
     <type name="MageStack\Integration\Model\Auth\AuthenticationPool">
         <arguments>
             <argument name="providers" xsi:type="array">
-                <item name="no_auth" xsi:type="object">MageStack\Integration\Model\Auth\Pool\NoAuthProvider</item>
-                <item name="bearer" xsi:type="object">MageStack\Integration\Model\Auth\Pool\BearerProvider</item>
+                <item name="no_auth" xsi:type="object">MageStack\Integration\Model\Auth\Pool\NoAuthProvider\Proxy</item>
+                <item name="bearer" xsi:type="object">MageStack\Integration\Model\Auth\Pool\BearerProvider\Proxy</item>
             </argument>
         </arguments>
     </type>
@@ -88,7 +88,7 @@
         </arguments>
     </type>
     <preference for="MageStack\Integration\Api\Data\ApiAttemptInterface" type="MageStack\Integration\Model\ApiAttempt" />
-    <type name="Magento\Backend\Model\Menu\Builder">
+    <!-- <type name="Magento\Backend\Model\Menu\Builder">
         <plugin name="mgs_integration_hide_menu_if_disabled" type="MageStack\Integration\Plugin\Admin\Menu\HideIfDisabled" />
-    </type>
+    </type> -->
 </config>
