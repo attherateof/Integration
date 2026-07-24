@@ -11,7 +11,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 
 class CredentialProvider
 {
-    private const DEFAULT_WEBSITE_CODE = 'base';
+    private const DEFAULT_WEBSITE_CODE = 'admin';
 
     public function __construct(
         private readonly CredentialRepositoryInterface $credentialRepository,
@@ -26,12 +26,12 @@ class CredentialProvider
             ->getId();
     }
 
-    private function getDefaultWebsiteId(): int
+    private function getDefaultWebsiteId(): ?int
     {
         try {
             return $this->getWebsiteId(self::DEFAULT_WEBSITE_CODE);
         } catch (NoSuchEntityException $e) {
-            return 0;
+            return null;
         }
     }
 
@@ -44,7 +44,7 @@ class CredentialProvider
         $websiteId = $this->getWebsiteId($websiteCode);
         $defaultWebsiteId = $this->getDefaultWebsiteId();
 
-        $websiteIds = ($defaultWebsiteId !== 0 && $defaultWebsiteId !== $websiteId)
+        $websiteIds = ($defaultWebsiteId !== null && $defaultWebsiteId !== $websiteId)
             ? [$websiteId, $defaultWebsiteId]
             : [$websiteId];
 

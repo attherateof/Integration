@@ -50,7 +50,7 @@ class Credential extends AbstractModel implements CredentialInterface, IdentityI
 
     public function setWebsiteId(int $websiteId): self
     {
-        return $this->setData(self::WEBSITE_ID, $websiteId);
+        $this->setData(self::WEBSITE_ID, $websiteId);
 
         return $this;
     }
@@ -62,7 +62,7 @@ class Credential extends AbstractModel implements CredentialInterface, IdentityI
 
     public function setAuthType(string $authType): self
     {
-        return $this->setData(self::AUTH_TYPE, $authType);
+        $this->setData(self::AUTH_TYPE, $authType);
 
         return $this;
     }
@@ -86,7 +86,7 @@ class Credential extends AbstractModel implements CredentialInterface, IdentityI
 
     public function setValue(?string $value): self
     {
-        return $this->setData(self::VALUE, $value);
+        $this->setData(self::VALUE, $value);
 
         return $this;
     }
@@ -98,7 +98,7 @@ class Credential extends AbstractModel implements CredentialInterface, IdentityI
 
     public function setUpdatedAt(?string $updatedAt): self
     {
-        return $this->setData(self::UPDATED_AT, $updatedAt);
+        $this->setData(self::UPDATED_AT, $updatedAt);
 
         return $this;
     }

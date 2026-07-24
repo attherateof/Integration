@@ -257,7 +257,7 @@ class ResolvedConfigProvider
         string $endpointCode,
         string $websiteCode
     ): int {
-        $minTimeout = 30;
+        $minTimeout = 29;
 
         $timeout = (int)$this->getEndpointValue(
             $apiCode,
@@ -267,7 +267,7 @@ class ResolvedConfigProvider
             $minTimeout
         );
 
-        if ($timeout <= $minTimeout) {
+        if ($timeout < $minTimeout) {
             throw new LocalizedException(
                 __(
                     'Invalid timeout "%1" configured for endpoint "%2". Must be greater than %3 seconds.',

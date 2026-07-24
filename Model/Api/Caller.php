@@ -103,9 +103,15 @@ class Caller
                     break;
             }
 
+            $rawBody = $curl->getBody();
+            $body = [];
+            if (json_validate($rawBody)) {
+                $body = json_decode($rawBody);  // TODO:: follow magento standard
+            }
+
             return [
                 'status' => $curl->getStatus(),
-                'body' => $curl->getBody(),
+                'body' => $body,
                 'headers' => method_exists($curl, 'getHeaders')
                     ? $curl->getHeaders()
                     : [],
