@@ -7,7 +7,7 @@ namespace MageStack\Integration\Model\Queue\Consumer;
 use Magento\Framework\Exception\NoSuchEntityException;
 use MageStack\Integration\Model\ApiAttemptRepository;
 use MageStack\Integration\Model\Service\Integration\IntegrationBuilderFactory;
-use MageStack\Integration\Model\Service\Integration\IntegrationManager;
+use MageStack\Integration\Model\Service\IntegrationManager;
 use MageStack\Integration\Model\Service\ResolvedConfigProvider;
 use Psr\Log\LoggerInterface;
 use Throwable;

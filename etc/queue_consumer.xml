@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/queue_consumer.xsd">
-    <consumer name="magestack.integration.attempt.consumer" queue="magestack.integration.attempt.queue">
-        <connection>amqp</connection>
-        <handler>MageStack\Integration\Model\Queue\Consumer\ProcessAttempt</handler>
-    </consumer>
-</config>

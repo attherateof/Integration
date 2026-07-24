@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/queue.xsd">
-    <topic name="magestack.integration.attempt.process">
-        <publisher />
-    </topic>
-    <consumer name="magestack.integration.attempt.consumer" queue="magestack.integration.attempt.queue" handler="MageStack\Integration\Model\Queue\Consumer\ProcessAttempt" />
-
-    <queue name="magestack.integration.attempt.queue" />
-</config>

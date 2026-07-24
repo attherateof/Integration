@@ -39,7 +39,7 @@ class BearerProvider extends AbstractProvider
         if (empty($token) || isset($token['bearer_token']) || empty($token['bearer_token'])) {
             throw new LocalizedException(
                 __(
-                    "Bearer token must be set for api code : %s and website code :%s .",
+                    "Bearer token must be set for api code : %1 and website code : %2 .",
                     $integrationRequest->getApiCode(),
                     $integrationRequest->getWebsiteCode()
                 )

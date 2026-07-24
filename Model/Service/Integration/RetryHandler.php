@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MageStack\Integration\Model\Service\Integration;
 
 use MageStack\Integration\Api\Data\ApiAttemptInterface;
-use MageStack\Integration\Model\Api\Retry\RetryScheduleCalculator;
+use MageStack\Integration\Model\Api\Retry\ScheduleCalculator;
 use MageStack\Integration\Model\ApiAttemptFactory;
 use MageStack\Integration\Model\ApiAttemptRepository;
 use MageStack\Integration\Model\Service\ResolvedConfigProvider;
@@ -21,7 +21,7 @@ class RetryHandler
         private readonly ResolvedConfigProvider $resolvedConfigProvider,
         private readonly ApiAttemptRepository $attemptRepository,
         private readonly ApiAttemptFactory $attemptFactory,
-        private readonly RetryScheduleCalculator $scheduleCalculator,
+        private readonly ScheduleCalculator $scheduleCalculator,
         private readonly LoggerInterface $logger
     ) {}
 

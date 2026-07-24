@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/queue_topology.xsd">
-    <exchange name="magestack.integration.exchange" type="topic" connection="amqp">
-        <binding id="magestack.integration.binding.attempt" destination="magestack.integration.attempt.queue" destination_type="queue" routing_key="magestack.integration.attempt.process" />
-    </exchange>
-
-    <queue name="magestack.integration.attempt.queue" />
-</config>

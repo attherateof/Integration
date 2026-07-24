@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MageStack\Integration\Model\Service\Integration;
+namespace MageStack\Integration\Model\Service;
 
 use InvalidArgumentException;
 use Magento\Store\Model\StoreManagerInterface;

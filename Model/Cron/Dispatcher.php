@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace MageStack\Integration\Model\Cron;
 
-use DateInterval;
-use DateTimeImmutable;
 use MageStack\Integration\Model\AdminConfig;
 use MageStack\Integration\Model\ApiAttemptRepository;
 use MageStack\Integration\Model\Queue\Publisher as AttemptPublisher;
 use MageStack\Integration\Model\SystemConfig\Source\CronSchedule;
+use MageStack\Integration\Api\Data\ApiAttemptInterface;
+use MageStack\Integration\Model\Service\ApiAttemptFilterService;
+use MageStack\Integration\Model\Service\Integration\IntegrationBuilderFactory;
+use MageStack\Integration\Model\Service\Integration\IntegrationBuilder;
+use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Psr\Log\LoggerInterface;
 
@@ -24,13 +27,16 @@ final class Dispatcher
         private readonly AdminConfig $adminConfig,
         private readonly CronSchedule $cronScheduleSource,
         private readonly DateTime $dateTime,
-        private readonly AttemptPublisher $publisher
+        private readonly AttemptPublisher $publisher,
+        private readonly ApiAttemptFilterService $apiRetryFilter,
+        private readonly IntegrationBuilderFactory $integrationBuilderFactory
     ) {}
 
     public function run(): int
     {
-        $this->logger->info('MageStack Integration dispatcher started.');
-
+        // Interval is currently only used to size the log/context; eligibility
+        // is driven by attempt count below, not by the created_at window,
+        // so a slow-processed batch can't fall permanently out of range.
         $intervalMinutes = $this->getIntervalMinutes();
         if ($intervalMinutes === null) {
             return 0;
@@ -48,8 +54,7 @@ final class Dispatcher
             $currentTimestamp - ($intervalMinutes * 60)
         );
 
-        $items = $this->attemptRepository->getListByAttemptAndNextAttemptRange(
-            PHP_INT_MAX,
+        $items = $this->apiRetryFilter->getFiltered(
             $from,
             $now,
             self::BATCH_SIZE
@@ -58,22 +63,26 @@ final class Dispatcher
         $published = 0;
 
         foreach ($items as $item) {
-            if ($item->getAttempt() >= $item->getMaxAttempt()) {
-                $item->setAttempt($item->getAttempt() + 1);
-                $this->attemptRepository->save($item);
+            if ($item->getAttempt() > $item->getMaxAttempt()) {
                 continue;
             }
 
-            $this->publisher->publishAttemptData($this->buildPayload($item));
+            if ($item->getAttempt() === $item->getMaxAttempt()) {
+                $this->markExhausted($item);
+                continue;
+            }
+
+            $apiRequest = $this->buildPayload($item);
+            $this->publisher->publishAttemptData($apiRequest);
+
+            if (!$this->incrementAttempt($item)) {
+                // Logged inside incrementAttempt(); skip counting this one
+                // as published since we can't confirm its state was persisted.
+                continue;
+            }
+
             $published++;
         }
-
-        $this->logger->info(
-            sprintf(
-                'MageStack Integration dispatcher published %d attempt(s).',
-                $published
-            )
-        );
 
         return $published;
     }
@@ -102,23 +111,65 @@ final class Dispatcher
     }
 
     /**
-     * Build queue payload.
-     *
-     * @param object $item
+     * Bump attempt count past max to mark the item as exhausted/no longer retryable.
      */
-    private function buildPayload(object $item): array
+    private function markExhausted(ApiAttemptInterface $item): void
     {
-        return [
-            'attempt_id' => $item->getId(),
-            'api_code' => $item->getApiCode(),
-            'endpoint_code' => $item->getEndpointCode(),
-            'website_code' => $item->getWebsiteCode(),
-            'request_body' => $item->getRequestBody(),
-            'headers' => $item->getHeaders(),
-            'url_params' => $item->getUrlParams(),
-            'attempt' => $item->getAttempt(),
-            'max_attempt' => $item->getMaxAttempt(),
-            'next_attempt_at' => $item->getNextAttemptAt(),
-        ];
+        $item->setAttempt($item->getAttempt() + 1);
+
+        try {
+            $this->attemptRepository->save($item);
+        } catch (\Throwable $exception) {
+            $this->logger->error(
+                'Failed to mark attempt as exhausted.',
+                [
+                    'id' => $item->getId(),
+                    'exception' => $exception,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Increment and persist attempt count after a successful publish.
+     *
+     * @return bool True if the save succeeded.
+     */
+    private function incrementAttempt(ApiAttemptInterface $item): bool
+    {
+        $item->setAttempt($item->getAttempt() + 1);
+
+        try {
+            $this->attemptRepository->save($item);
+
+            return true;
+        } catch (\Throwable $exception) {
+            $this->logger->error(
+                'Failed to update attempt count after publish.',
+                [
+                    'id' => $item->getId(),
+                    'exception' => $exception,
+                ]
+            );
+
+            return false;
+        }
+    }
+
+    /**
+     * Build queue payload.
+     */
+    private function buildPayload(ApiAttemptInterface $item): IntegrationBuilder
+    {
+        $integrationBuilder = $this->integrationBuilderFactory->create();
+
+        $integrationBuilder->setApiCode($item->getApiCode())
+            ->setEndpointCode($item->getEndpointCode())
+            ->setWebsiteCode($item->getWebsiteCode())
+            ->setData($item->getInputData())
+            ->setUrlParams($item->getUrlParams())
+            ->setAttempt($item->getAttempt());
+
+        return $integrationBuilder;
     }
 }

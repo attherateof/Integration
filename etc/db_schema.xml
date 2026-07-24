@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
-
     <table name="magestack_integration_credential"
            resource="default"
            engine="innodb"
@@ -94,6 +93,10 @@
                 name="data"
                 nullable="true"
                 comment="input data"/>
+        <column xsi:type="text"
+                name="headers"
+                nullable="true"
+                comment="custom headers"/>
         <column xsi:type="int"
                 name="attempt"
                 nullable="false"
@@ -110,6 +113,12 @@
                 name="next_attempt_at"
                 nullable="true"
                 comment="Next Attempt At"/>
+        <column xsi:type="smallint"
+                name="is_in_queue"
+                unsigned="true"
+                nullable="false"
+                default="0"
+                comment="Is in queue?"/>
         <column xsi:type="timestamp"
                 name="created_at"
                 on_update="false"

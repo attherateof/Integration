@@ -14,7 +14,7 @@ use MageStack\Integration\Model\SystemConfig\Source\CronSchedule;
  * $attemptCount is 0-indexed: 0 = first attempt (first failure), 1 = second attempt, etc.
  * capped at maxDelayMinutes when provided.
  */
-class RetryScheduleCalculator
+class ScheduleCalculator
 {
     /**
      * @param MagentoDateTime $coreDateTime

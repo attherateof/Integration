@@ -24,17 +24,22 @@ class RequestAssembler
         array $payload,
         array $urlParams
     ): array {
-        $requestBuilder = $this->resolvedConfigProvider->getEndpointRequestBuilder($apiCode, $endpointCode, $websiteCode);
+        // $requestBuilder = $this->resolvedConfigProvider->getEndpointRequestBuilder($apiCode, $endpointCode, $websiteCode);
 
         // TODO:: next line will change once we have an endpoint-scoped request builder
         // $resolvedConfig = $this->resolvedConfigProvider->getResolvedConfig($apiCode, $websiteCode);
 
         // $built = $requestBuilder->build($websiteId, $resolvedConfig, $payload, $urlParams);
-        $built = [];
+        // $built = [];
+        // return [
+        //     $built['payload'] ?? [],
+        //     $built['urlParams'] ?? [],
+        //     $built['headers'] ?? [],
+        // ];
         return [
-            $built['payload'] ?? [],
-            $built['urlParams'] ?? [],
-            $built['headers'] ?? [],
+            [],
+            [],
+            []
         ];
     }
 }

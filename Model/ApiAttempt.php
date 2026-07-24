@@ -4,15 +4,31 @@ declare(strict_types=1);
 
 namespace MageStack\Integration\Model;
 
+use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Registry;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
 use MageStack\Integration\Api\Data\ApiAttemptInterface;
-use Override;
+use MageStack\Integration\Model\ResourceModel\ApiAttempt as ApiAttemptResourceModel;
+use Magento\Framework\Serialize\SerializerInterface;
 
 class ApiAttempt extends AbstractModel implements ApiAttemptInterface
 {
+    public function __construct(
+        private readonly SerializerInterface $serializer,
+        Context $context,
+        Registry $registry,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+    }
+
     protected function _construct(): void
     {
-        $this->_init(\MageStack\Integration\Model\ResourceModel\ApiAttempt::class);
+        $this->_init(ApiAttemptResourceModel::class);
     }
 
     public function getId(): ?int
@@ -54,25 +70,71 @@ class ApiAttempt extends AbstractModel implements ApiAttemptInterface
         return $this;
     }
 
-    public function getPayload(): ?string
+    public function getInputData(): ?array
     {
-        return $this->getData(self::PAYLOAD);
+        $inputData = $this->getData(self::DATA);
+        if (is_string($inputData) && json_validate($inputData)) {
+            $inputData = $this->serializer->unserialize($inputData);
+        }
+
+        if (is_array($inputData)) {
+            return $inputData;
+        }
+
+        return [];
     }
 
-    public function setPayload(?string $payload): self
+    public function setInputData(array $data = []): self
     {
-        $this->setData(self::PAYLOAD, $payload);
+        $serialized = $this->serializer->serialize($data);
+        $this->setData(self::DATA, $serialized);
+
         return $this;
     }
 
-    public function getUrlParams(): ?string
+    public function getUrlParams(): ?array
     {
-        return $this->getData(self::URL_PARAMS);
+        $urlParams = $this->getData(self::URL_PARAMS);
+        if (is_string($urlParams) && json_validate($urlParams)) {
+            $urlParams = $this->serializer->unserialize($urlParams);
+        }
+
+        if (is_array($urlParams)) {
+            return $urlParams;
+        }
+
+        return [];
     }
 
-    public function setUrlParams(?string $params): self
+    public function setUrlParams(array $params = []): self
     {
-        $this->setData(self::URL_PARAMS, $params);
+        $serialized = $this->serializer->serialize($params);
+
+        $this->setData(self::URL_PARAMS, $serialized);
+
+        return $this;
+    }
+
+    public function getHeaders(): ?array
+    {
+        $headers = $this->getData(self::HEADERS);
+        if (is_string($headers) && json_validate($headers)) {
+            $headers = $this->serializer->unserialize($headers);
+        }
+
+        if (is_array($headers)) {
+            return $headers;
+        }
+
+        return [];
+    }
+
+    public function setHeaders(array $headers = []): self
+    {
+        $serialized = $this->serializer->serialize($headers);
+
+        $this->setData(self::HEADERS, $serialized);
+
         return $this;
     }
 

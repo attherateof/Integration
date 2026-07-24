@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/queue_consumer.xsd">
+    <consumer name="magestack.integration.retry"
+            queue="magestack.integration.retry"
+            connection="amqp"
+            consumerInstance="Magento\Framework\MessageQueue\Consumer"
+            handler="MageStack\Integration\Model\Queue\Consumer\ProcessAttempt::process"/>
+</config>
