@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MageStack\Integration\Model\Service\Integration;
 
 use MageStack\Integration\Model\Service\ResolvedConfigProvider;
+use MageStack\Integration\Model\Service\Integration\IntegrationBuilder;
 
 /**
  * Resolves the endpoint's configured request builder and assembles the
@@ -17,29 +18,18 @@ class RequestAssembler
     ) {}
 
     public function assemble(
-        int $websiteId,
-        string $apiCode,
-        string $endpointCode,
-        string $websiteCode,
-        array $payload,
-        array $urlParams
+        IntegrationBuilder $request
     ): array {
-        // $requestBuilder = $this->resolvedConfigProvider->getEndpointRequestBuilder($apiCode, $endpointCode, $websiteCode);
+        $requestBuilder = $this->resolvedConfigProvider->getEndpointRequestBuilder(
+            $request->getApiCode(),
+            $request->getEndpointCode(),
+            $request->getWebsiteCode()
+        );
 
-        // TODO:: next line will change once we have an endpoint-scoped request builder
-        // $resolvedConfig = $this->resolvedConfigProvider->getResolvedConfig($apiCode, $websiteCode);
-
-        // $built = $requestBuilder->build($websiteId, $resolvedConfig, $payload, $urlParams);
-        // $built = [];
-        // return [
-        //     $built['payload'] ?? [],
-        //     $built['urlParams'] ?? [],
-        //     $built['headers'] ?? [],
-        // ];
-        return [
-            [],
-            [],
-            []
+        return $requestBuilder !== null ? $requestBuilder->build($request) : [
+            $request->getHeaders(),
+            $request->getData(),
+            $request->getUrlParams()
         ];
     }
 }

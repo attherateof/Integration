@@ -458,7 +458,7 @@ class ResolvedConfigProvider
         string $apiCode,
         string $endpointCode,
         string $websiteCode
-    ): RequestBuilderInterface {
+    ): ?RequestBuilderInterface {
         $requestBuilderIdentifier = $this->getEndpointValue(
             $apiCode,
             $endpointCode,
@@ -466,17 +466,11 @@ class ResolvedConfigProvider
             'request_builder'
         );
 
-        if (!is_string($requestBuilderIdentifier)) {
-            throw new LocalizedException(
-                __(
-                    'Request builder identifier for "%1" is missing required configuration "%2".',
-                    $endpointCode,
-                    $apiCode
-                )
-            );
+        if (is_string($requestBuilderIdentifier) && $requestBuilderIdentifier !== '') {
+            return $this->requestBuilderPool->get((string)$requestBuilderIdentifier);
         }
 
-        return $this->requestBuilderPool->get((string)$requestBuilderIdentifier);
+        return null;
     }
 
     public function getEndpointResponseValidator(

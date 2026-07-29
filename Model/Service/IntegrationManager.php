@@ -40,23 +40,13 @@ class IntegrationManager
         $endpointCode = $request->getEndpointCode();
         $websiteCode = $request->getWebsiteCode();
         $payload = $request->getData();
-        $urlParams = $request->getUrlParams();
 
-        $websiteId = (int) $this->storeManager->getWebsite($websiteCode)->getId();
-
-        [$requestPayload, $requestUrlParams, $headers] = $this->requestAssembler->assemble(
-            $websiteId,
-            $apiCode,
-            $endpointCode,
-            $websiteCode,
-            $payload,
-            $urlParams
-        );
+        [$headers, $body, $urlParams] = $this->requestAssembler->assemble($request);
 
         $cacheEnabled = $this->endpointCache->isEnabled($apiCode, $endpointCode, $websiteCode);
 
         if ($cacheEnabled) {
-            $cached = $this->endpointCache->fetch($apiCode, $endpointCode, $websiteCode, $requestPayload, $requestUrlParams);
+            $cached = $this->endpointCache->fetch($apiCode, $endpointCode, $websiteCode, $body, $urlParams);
 
             if ($cached !== false) {
                 return $cached;
@@ -72,8 +62,8 @@ class IntegrationManager
             $apiCode,
             $endpointCode,
             $websiteCode,
-            $requestPayload,
-            $requestUrlParams,
+            $body,
+            $urlParams,
             $headers,
             $payload
         );
@@ -83,7 +73,7 @@ class IntegrationManager
         $response = $this->responseProcessor->process($response, $apiCode, $endpointCode, $websiteCode);
 
         if ($cacheEnabled) {
-            $this->endpointCache->store($apiCode, $endpointCode, $websiteCode, $response, $requestPayload, $requestUrlParams);
+            $this->endpointCache->store($apiCode, $endpointCode, $websiteCode, $response, $payload, $urlParams);
         }
 
         return $response;
