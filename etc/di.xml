@@ -33,6 +33,7 @@
             <argument name="providers" xsi:type="array">
                 <item name="no_auth" xsi:type="object">MageStack\Integration\Model\Auth\Pool\NoAuthProvider\Proxy</item>
                 <item name="bearer" xsi:type="object">MageStack\Integration\Model\Auth\Pool\BearerProvider\Proxy</item>
+                <!-- <item name="basic_auth" xsi:type="object">MageStack\Integration\Model\Auth\Pool\BasicAuthProvider\Proxy</item> -->
             </argument>
         </arguments>
     </type>

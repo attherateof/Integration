@@ -41,9 +41,10 @@ class Converter implements ConverterInterface
     private const ATTR_PATH = 'path';
     private const ATTR_GUEST = 'guest';
     private const ATTR_TIMEOUT = 'timeout';
-    private const ATTR_TYPE = 'type';
-    private const ATTR_TOKEN_ENDPOINT = 'token_endpoint';
-    private const ATTR_TOKEN_TTL = 'token_ttl';
+    private const AUTH_TYPE = 'type';
+    private const AUTH_ENDPOINT_ID = 'endpoint_id';
+    private const AUTH_CONFIG_FIELDS = 'configuration';
+    private const AUTH_CONFIG_FIELD = 'field';
     private const ATTR_MAX_ATTEMPTS = 'max_attempts';
     private const ATTR_BACKOFF_MULTIPLIER = 'backoff_multiplier';
     private const ATTR_TTL = 'ttl';
@@ -60,15 +61,6 @@ class Converter implements ConverterInterface
      * Result array keys
      */
     private const KEY_HTTP_CODES = 'http_codes';
-
-    /**
-     * Attribute lists for generic attribute parsing
-     */
-    private const AUTHENTICATION_ATTRIBUTES = [
-        self::ATTR_TYPE,
-        self::ATTR_TOKEN_ENDPOINT,
-        self::ATTR_TOKEN_TTL,
-    ];
 
     private const RETRY_ATTRIBUTES = [
         self::ATTR_ENABLED,
@@ -194,10 +186,40 @@ class Converter implements ConverterInterface
             return [];
         }
 
-        return $this->parseAttributes(
-            $node,
-            self::AUTHENTICATION_ATTRIBUTES
-        );
+        $authentication = [
+            'type' => $this->getDirectChildText($node, 'type') ?: null,
+            'endpoint_id' => $this->getDirectChildText($node, 'endpoint_id') ?: null,
+            'configuration' => [],
+        ];
+
+        $configurationNode = $this->getDirectChild($node, 'configuration');
+
+        if (!$configurationNode) {
+            return $authentication;
+        }
+
+        foreach ($configurationNode->childNodes as $child) {
+            if (!$child instanceof DOMElement || $child->tagName !== 'field') {
+                continue;
+            }
+
+            $name = $child->getAttribute('name');
+
+            if ($name === '') {
+                continue;
+            }
+
+            $authentication['configuration'][$name] = [
+                'label' => $child->getAttribute('label') ?: null,
+                'type' => $child->getAttribute('type') ?: null,
+                'encrypted' => $this->getOptionalBoolAttribute($child, 'encrypted'),
+                'class' => $child->getAttribute('class') ?: null,
+                'value' => $child->getAttribute('value') ?: null,
+                'source' => $child->getAttribute('source') ?: null,
+            ];
+        }
+
+        return $authentication;
     }
 
     private function parseRetry(DOMElement $parent): array
